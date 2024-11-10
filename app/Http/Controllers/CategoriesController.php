@@ -5,14 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Categories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class CategoriesController extends Controller
 {
     public function getCategories()
     {
-        $getCategories = Categories::get();
-        return $getCategories;
+        // Thử lấy danh mục từ cache Redis
+        $categories = Cache::store('redis')->get('categories');
+    
+        if (!$categories) {
+            // Nếu không tìm thấy trong cache, lấy danh mục từ cơ sở dữ liệu
+            $categories = Categories::get();
+    
+            // Lưu kết quả vào cache Redis trong 60 phút
+            Cache::store('redis')->put('categories', $categories, 60);
+        }
+    
+        return $categories;
     }
+    
     public function addCate(Request $request)
     {
             $data = $request->input();
