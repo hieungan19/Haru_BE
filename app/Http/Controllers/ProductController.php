@@ -67,10 +67,10 @@ class ProductController extends Controller
 
             $uploadedFileUrl = Cloudinary::upload($request->file('image')->getRealPath())->getSecurePath();
 
-            $newProduct = new Product();
+            // $newProduct = new Product();
 
-            $newProduct->image = $uploadedFileUrl;
-            $newProduct->save();
+            // $newProduct->image = $uploadedFileUrl;
+            // $newProduct->save();
 
             if ($uploadedFileUrl) 
                 return response()->json(['url' => $uploadedFileUrl], 200);
@@ -95,7 +95,7 @@ class ProductController extends Controller
                     'brand_id' => $data['brand_id'],
                     'price' => $data['price'],
                     'inventory_quantity' => $data['inventory_quantity'],
-                    // 'image' => $data['image'],
+                    'image' => $data['image'],
                     'quantity_sold' => 0,
                     'status' => true,
                     'star' => 0
