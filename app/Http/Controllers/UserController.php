@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use use GuzzleHttp\Client;
+
 
 class UserController extends Controller
 {
@@ -18,6 +20,7 @@ class UserController extends Controller
     }
     public function registerUser(Request $request)
     {
+        $client = new Client();
         if ($request->isMethod('post')) {
             $data = $request->input();
 
@@ -40,7 +43,7 @@ class UserController extends Controller
             }
 
             $user = User::create([
-                'name' => $data['email'],
+                'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => bcrypt($data['password'])
             ]);
@@ -48,7 +51,13 @@ class UserController extends Controller
             $token = $user->createToken('myapptoken')->plainTextToken;
             $user->token = $token;
             $user->save();
-
+            $emailFunctionUrl = "https://is402function.azurewebsites.net/api/email_welcome?"; 
+            $queryParams = [
+                'email' => $data['email'],
+                'name' => $data['email']
+            ];   
+             $response = $client->get($emailFunctionUrl, [
+        'query' => $queryParams]);
             return response()->json([
                 'status' => true,
                 'message' => 'Singup successful'
