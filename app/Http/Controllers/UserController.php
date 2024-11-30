@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-use use GuzzleHttp\Client;
+use GuzzleHttp\Client;
 
 
 class UserController extends Controller
