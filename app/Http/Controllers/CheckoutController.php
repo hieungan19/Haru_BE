@@ -7,14 +7,19 @@ use Illuminate\Support\Facades\DB;
 
 class CheckoutController extends Controller
 {
-    public function execPostRequest($url, $data){
+    public function execPostRequest($url, $data)
+    {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        curl_setopt(
+            $ch,
+            CURLOPT_HTTPHEADER,
+            array(
                 'Content-Type: application/json',
-                'Content-Length: ' . strlen($data))
+                'Content-Length: ' . strlen($data)
+            )
         );
         curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -24,9 +29,10 @@ class CheckoutController extends Controller
         curl_close($ch);
         return $result;
     }
-    public function Momo(Request $request){
+    public function Momo(Request $request)
+    {
         $order_id = DB::table('orders')->max('id');
-        
+
         $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
 
         $partnerCode = 'MOMOBKUN20180529';
@@ -34,7 +40,7 @@ class CheckoutController extends Controller
         $serectkey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
         $orderInfo = "Thanh toán qua MoMo";
         $amount = intval($request->input("query"));
-        $orderId = time() ."";
+        $orderId = time() . "";
         $redirectUrl = "http://localhost:5173/thanks";
         $ipnUrl = "http://localhost:5173/thanks";
         $extraData = $order_id;
@@ -59,7 +65,7 @@ class CheckoutController extends Controller
             'signature' => $signature
         );
         $result = $this->execPostRequest($endpoint, json_encode($data));
-        $jsonResult = json_decode($result, true);  
+        $jsonResult = json_decode($result, true);
 
         header('Location: ' . $jsonResult['payUrl']);
         return $jsonResult;
@@ -68,11 +74,12 @@ class CheckoutController extends Controller
     {
         $orderID = DB::table('orders')->max('id');
         $billAmount = intval($request->input("query"));
+        $app_url = env('APP_FRONT_END_URL');
 
-        $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        $vnp_Returnurl = "http://localhost:5173/thanks";
-        $vnp_TmnCode = "7E23ITIE"; //Mã website tại VNPAY 
-        $vnp_HashSecret = "JHVKPNVHLCBOYTVGHSEVSVEOLCTRLRLG"; //Chuỗi bí mật
+        $vnp_Url = env('VNP_URL'); // Lấy URL VNPAY
+        $vnp_Returnurl = `${app_url}/thanks`;
+        $vnp_TmnCode = env('VNP_TMN_CODE'); // Lấy Mã website tại VNPAY
+        $vnp_HashSecret = env('VNP_HASH_SECRET'); // Lấy chuỗi bí mật từ .env
 
         $vnp_TxnRef = $orderID; //Mã đơn hàng. Trong thực tế Merchant cần insert đơn hàng vào DB và gửi mã này sang VNPAY
         $vnp_OrderInfo = 'Thanh toán VNPay';
@@ -81,7 +88,7 @@ class CheckoutController extends Controller
         $vnp_Locale = 'vn';
         $vnp_BankCode = 'NCB'; //Code cho phép chọn ngân hàng khác 
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
-        
+
         $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,
@@ -117,19 +124,19 @@ class CheckoutController extends Controller
 
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
-            $vnpSecureHash =   hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+            $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
         if (isset($_POST['redirect'])) {
             header('Location: ' . $vnp_Url);
             die();
-        } 
+        }
         return response()->json([
             'vnp_Url' => $vnp_Url,
             'query' => $query
         ], 200);
     }
-    
+
     public function getVNPay()
     {
         return view('test');
