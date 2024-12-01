@@ -77,7 +77,7 @@ class CheckoutController extends Controller
         $app_url = env('APP_FRONT_END_URL');
 
         $vnp_Url = env('VNP_URL'); // Lấy URL VNPAY
-        $vnp_Returnurl = `${app_url}/thanks`;
+        $vnp_Returnurl = env('APP_FRONT_END_URL');
         $vnp_TmnCode = env('VNP_TMN_CODE'); // Lấy Mã website tại VNPAY
         $vnp_HashSecret = env('VNP_HASH_SECRET'); // Lấy chuỗi bí mật từ .env
 
@@ -95,6 +95,7 @@ class CheckoutController extends Controller
             "vnp_Amount" => $vnp_Amount,
             "vnp_Command" => "pay",
             "vnp_CreateDate" => date('YmdHis'),
+            "vnp_ExpireDate" => date('YmdHis') + 1500,
             "vnp_CurrCode" => "VND",
             "vnp_IpAddr" => $vnp_IpAddr,
             "vnp_Locale" => $vnp_Locale,
@@ -104,9 +105,7 @@ class CheckoutController extends Controller
             "vnp_TxnRef" => $vnp_TxnRef
         );
 
-        if (isset($vnp_BankCode) && $vnp_BankCode != "") {
-            $inputData['vnp_BankCode'] = $vnp_BankCode;
-        }
+
 
         ksort($inputData);
         $query = "";
