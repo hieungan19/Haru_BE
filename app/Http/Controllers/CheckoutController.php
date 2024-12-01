@@ -95,7 +95,7 @@ class CheckoutController extends Controller
             "vnp_Amount" => $vnp_Amount,
             "vnp_Command" => "pay",
             "vnp_CreateDate" => date('YmdHis'),
-            "vnp_ExpireDate" => date('YmdHis') + 1500,
+            "vnp_ExpireDate" => date('YmdHis', strtotime(date('YmdHis')) + 1500),
             "vnp_CurrCode" => "VND",
             "vnp_IpAddr" => $vnp_IpAddr,
             "vnp_Locale" => $vnp_Locale,
