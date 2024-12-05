@@ -51,7 +51,7 @@ class UserController extends Controller
             $token = $user->createToken('myapptoken')->plainTextToken;
             $user->token = $token;
             $user->save();
-            $emailFunctionUrl = "https://is402function.azurewebsites.net/api/email_welcome?"; 
+            $emailFunctionUrl = env('FUNCTION_EMAIL_WELCOME'); 
             $queryParams = [
                 'email' => $data['email'],
                 'name' => $data['email']
